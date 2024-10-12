@@ -91,6 +91,8 @@ void print_table(const vector<int>& vec1, const vector<double>& vec2, const vect
     }
     cout << endl;
 
+    cout << scientific << setprecision(4);
+
     size_t length = vec1.size();
 
     for (size_t i = 0; i < length; ++i) {
