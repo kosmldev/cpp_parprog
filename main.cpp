@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <ctime>
+#include <chrono>
 
 using namespace std;
 
@@ -20,19 +21,36 @@ vector<vector<double>> generate_random_matrix(int n) {
     return matrix;
 }
 
+// Функция для LU-разложения
+void LU_decomposition(vector<vector<double>>& matrix, int n) {
+    for (int i = 0; i < n; i++) {
+        for (int j = i + 1; j < n; j++) {
+            matrix[j][i] /= matrix[i][i];
+            for (int k = i + 1; k < n; k++) {
+                matrix[j][k] -= matrix[j][i] * matrix[i][k];
+            }
+        }
+    }
+}
+
+// Функция для замера времени
+double measure_time(vector<vector<double>>& matrix, int n) {
+    auto start = chrono::high_resolution_clock::now();
+    LU_decomposition(matrix, n);
+    auto end = chrono::high_resolution_clock::now();
+    chrono::duration<double> elapsed = end - start;
+    return elapsed.count();
+}
+
 int main() {
-    vector<int> sizes = {4}; // размеры матриц
+
+    vector<int> sizes = {4, 8, 16, 32, 64, 128, 256, 512, 1024}; // размеры матриц
     int sizes_size = sizes.size();
-    
+
     for (int one_size = 0; one_size < sizes_size; one_size++) {
         vector<vector<double>> matrix = generate_random_matrix(sizes[one_size]);
-        for (int i = 0; i < sizes[one_size]; i++){
-            
-            for (int j = 0; j < sizes[one_size]; j++){
-                cout << matrix[i][j] << "\t";
-            }
-            cout << endl
-        }
+        double time = measure_time(matrix, sizes[one_size]);
+        cout << "Running native. Matrix size: " << sizes[one_size] << " Time: " << time << endl;
     }
     return 0;
 }
