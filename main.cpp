@@ -21,5 +21,18 @@ vector<vector<double>> generate_random_matrix(int n) {
 }
 
 int main() {
+    vector<int> sizes = {4}; // размеры матриц
+    int sizes_size = sizes.size();
+    
+    for (int one_size = 0; one_size < sizes_size; one_size++) {
+        vector<vector<double>> matrix = generate_random_matrix(sizes[one_size]);
+        for (int i = 0; i < sizes[one_size]; i++){
+            
+            for (int j = 0; j < sizes[one_size]; j++){
+                cout << matrix[i][j] << "\t";
+            }
+            cout << endl
+        }
+    }
     return 0;
 }
