@@ -115,9 +115,9 @@ int main() {
         Далее прогоняется через LAPACK
     */
     
-    vector<int> sizes = {4, 8, 16, 32, 64, 128, 256, 512, 1024}; // размеры матриц
+    vector<int> sizes = {4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048}; // размеры матриц
     int sizes_size = sizes.size();
-    int meas_cnt = 10; // сколько измерений за итерацию делать
+    int meas_cnt = 3; // сколько измерений за итерацию делать
     vector<double> output_min_times(sizes_size);
     vector<double> output_mean_times(sizes_size);
     vector<double> output_max_times(sizes_size);
