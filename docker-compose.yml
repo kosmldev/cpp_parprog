@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  cpp-app:
+    image: gcc:latest
+    container_name: cpp_app_container
+    volumes:
+      - ./src:/usr/src/app
+    working_dir: /usr/src/app
+    command: bash -c "apt-get update && apt-get install -y liblapack-dev && g++ main.cpp -o main -llapack -lblas && ./main"
