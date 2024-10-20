@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <numeric>
 #include <iomanip>
+#include <cblas.h>
 
 extern "C" {
     void dgetrf_(int*, int*, double*, int*, int*, int*);
@@ -51,7 +52,7 @@ double measure_time(vector<vector<double>>& matrix, int n) {
 
 // Вызов LU через LAPACK
 void LU_decomposition_lapack(vector<double>& matrix, int n) {
-    int* ipiv = new int[n + 1];
+    int* ipiv = new int[n];
     int info;
     dgetrf_(&n, &n, matrix.data(), &n, ipiv, &info);
     delete[] ipiv;
@@ -114,8 +115,11 @@ int main() {
         Сначала прогоняется обычное нативное LU разложение через цикл
         Далее прогоняется через LAPACK
     */
+    openblas_set_num_threads(4);
+    int num_threads = openblas_get_num_threads();
+    printf("OpenBLAS использует %d потоков.\n", num_threads);
     
-    vector<int> sizes = {4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048}; // размеры матриц
+    vector<int> sizes = {4, 8, 16, 32, 64, 128, 256, 512, 1024 , 2048 , 10000}; // размеры матриц
     int sizes_size = sizes.size();
     int meas_cnt = 3; // сколько измерений за итерацию делать
     vector<double> output_min_times(sizes_size);
@@ -126,18 +130,18 @@ int main() {
     vector<double> output_max_times_lpck(sizes_size);
     vector<string> headers = {"Size","Native_min", "LAPACK_min", "Native_mean", "LAPACK_mean", "Native_max", "LAPACK_max"};
 
-    for (int one_size = 0; one_size < sizes_size; one_size++) {
-        vector<double> times_vector(meas_cnt);
-        for (int iteration = 0; iteration < meas_cnt; iteration++)  {
-            cout << "Running native. Matrix size: " << sizes[one_size] << " Iteration: " << iteration + 1 << endl;
-            vector<vector<double>> matrix = generate_random_matrix(sizes[one_size]);
-            double time = measure_time(matrix, sizes[one_size]);
-            times_vector[iteration] = time;
-        }
-        output_min_times[one_size] = *min_element(times_vector.begin(), times_vector.end());
-        output_max_times[one_size] = *max_element(times_vector.begin(), times_vector.end());
-        output_mean_times[one_size] = (accumulate(times_vector.begin(), times_vector.end(), 0.0)) / static_cast<double>(times_vector.size());
-    }
+    // for (int one_size = 0; one_size < sizes_size; one_size++) {
+    //     vector<double> times_vector(meas_cnt);
+    //     for (int iteration = 0; iteration < meas_cnt; iteration++)  {
+    //         cout << "Running native. Matrix size: " << sizes[one_size] << " Iteration: " << iteration + 1 << endl;
+    //         vector<vector<double>> matrix = generate_random_matrix(sizes[one_size]);
+    //         double time = measure_time(matrix, sizes[one_size]);
+    //         times_vector[iteration] = time;
+    //     }
+    //     output_min_times[one_size] = *min_element(times_vector.begin(), times_vector.end());
+    //     output_max_times[one_size] = *max_element(times_vector.begin(), times_vector.end());
+    //     output_mean_times[one_size] = (accumulate(times_vector.begin(), times_vector.end(), 0.0)) / static_cast<double>(times_vector.size());
+    // }
 
     for (int one_size = 0; one_size < sizes_size; one_size++) {
         vector<double> times_vector(meas_cnt);
