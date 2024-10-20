@@ -8,7 +8,22 @@
 Программа расположена по пути [`src/main.cpp`](https://github.com/kosmldev/cpp_parprog/blob/main/src/main.cpp).
 
 ## Запуск программы
+### Dockerfile 
+Сборка контейнера:  
+```sh
+docker build -t parallel .
+```
+Запуск контейнера:  
+```sh
+docker run --rm --cpus="4" parallel
+```
 
+upd:  
+1. В функции main явно указывается колличество используемых ядер.
+2. По приколу ограничеваем кол-во ядер для контейнера при запуске.
+3. Можно поиграться с автоматическим определением кол-во ядер (мне в падлу). 
+
+### Dockercompose
 Для запуска воспользуйтесь файлом [`docker-compose.yml`](https://github.com/kosmldev/cpp_parprog/blob/main/docker-compose.yml):
 
 ```bash
