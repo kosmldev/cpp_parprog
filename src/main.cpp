@@ -16,15 +16,15 @@ extern "C" {
 using namespace std;
 
 // Функция для генерации случайной матрицы размером n на n
-vector<vector<double>> generate_random_matrix(int n) {
-    vector<vector<double>> matrix(n, vector<double>(n));
+vector<double> generate_random_matrix(int n) {
+    vector<double> matrix(n * n);
     
     // Инициализация генератора случайных чисел
     srand(time(0));
 
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
-            matrix[i][j] = 2.0 * (static_cast<double>(rand()) / RAND_MAX) - 1.0;
+            matrix[j * n + i] = 2.0 * (static_cast<double>(rand()) / RAND_MAX) - 1.0;
         }
     }
 
@@ -32,19 +32,19 @@ vector<vector<double>> generate_random_matrix(int n) {
 }
 
 // Функция для LU-разложения
-void LU_decomposition(vector<vector<double>>& matrix, int n) {
+void LU_decomposition(vector<double>& matrix, int n) {
     for (int i = 0; i < n; i++) {
         for (int j = i + 1; j < n; j++) {
-            matrix[j][i] /= matrix[i][i];
+            matrix[j * n + i] /= matrix[i * n + i];
             for (int k = i + 1; k < n; k++) {
-                matrix[j][k] -= matrix[j][i] * matrix[i][k];
+                matrix[j * n + k] -= matrix[j * n + i] * matrix[i * n + k];
             }
         }
     }
 }
 
 // Функция для замера времени
-double measure_time(vector<vector<double>>& matrix, int n) {
+double measure_time(vector<double>& matrix, int n) {
     auto start = chrono::high_resolution_clock::now();
     LU_decomposition(matrix, n);
     auto end = chrono::high_resolution_clock::now();
@@ -68,19 +68,6 @@ double measure_time_lapack(vector<double>& matrix, int n) {
     auto end = chrono::high_resolution_clock::now();
     chrono::duration<double> elapsed = end - start;
     return elapsed.count();
-}
-
-// Функция для преобразования матрицы n x n в одномерный массив (LAPACK ест в таком виже)
-vector<double> flatten_matrix(const vector<vector<double>>& matrix, int n) {
-    vector<double> flat_matrix(n * n);
-
-    for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < n; ++j) {
-            flat_matrix[i * n + j] = matrix[i][j];
-        }
-    }
-
-    return flat_matrix;
 }
 
 
@@ -165,7 +152,7 @@ int main() {
             vector<double> times_vector(meas_cnt);
             for (int iteration = 0; iteration < meas_cnt; iteration++)  {
                 cout << "Running native. Matrix size: " << sizes[one_size] << " Iteration: " << iteration + 1 << endl;
-                vector<vector<double>> matrix = generate_random_matrix(sizes[one_size]);
+                vector<double> matrix = generate_random_matrix(sizes[one_size]);
                 double time = measure_time(matrix, sizes[one_size]);
                 times_vector[iteration] = time;
             }
@@ -179,7 +166,7 @@ int main() {
         vector<double> times_vector(meas_cnt);
         for (int iteration = 0; iteration < meas_cnt; iteration++)  {
             cout << "Running LAPACK. Matrix size: " << sizes[one_size] << " Iteration: " << iteration + 1 << endl;
-            vector<double> matrix = flatten_matrix(generate_random_matrix(sizes[one_size]), sizes[one_size]);
+            vector<double> matrix = generate_random_matrix(sizes[one_size]);
             double time = measure_time_lapack(matrix, sizes[one_size]);
             times_vector[iteration] = time;
         }
